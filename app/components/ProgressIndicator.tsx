@@ -182,7 +182,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       <div className="container mx-auto relative z-10">
         <div className="flex justify-center relative">
           {/* Progress line */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted -translate-y-1/2"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted dark:bg-muted-foreground -translate-y-1/2"></div>
 
           {/* Steps container with horizontal scroll on mobile */}
           <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 px-2 md:px-0 overflow-x-auto no-scrollbar max-w-screen-lg mx-auto">

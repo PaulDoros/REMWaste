@@ -10,6 +10,18 @@ export default defineConfig({
       '~': '/app',
     },
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
+    },
+  },
   server: {
     host: '0.0.0.0', // Listen on all addresses
     port: 5173,

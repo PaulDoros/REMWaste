@@ -346,3 +346,86 @@ app/
 ## Author
 
 Designed and developed by [Paul Doros](https://pauldoros.site).
+
+# RemWaste Demo - Sandbox Version
+
+This is a sandbox version of the RemWaste Demo application, created for testing and evaluation purposes.
+
+## Features
+
+- Modern React application with TypeScript
+- Responsive design with Tailwind CSS
+- Interactive skip selection and comparison
+- Theme switching (light/dark mode)
+- Mobile-first approach
+- Accessibility features
+- Performance optimizations
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Open [http://localhost:5173](http://localhost:5173) in your browser
+
+## Testing Instructions
+
+1. **Skip Selection**
+
+   - Browse through different skip sizes
+   - Click on a skip to select it
+   - Verify the selection is highlighted
+
+2. **Comparison Feature**
+
+   - Enable comparison mode
+   - Select up to 3 skips to compare
+   - View detailed comparison in the drawer
+
+3. **Filtering**
+
+   - Use the filter panel to sort skips
+   - Apply filters for heavy waste and road placement
+   - Reset filters to default view
+
+4. **Theme Switching**
+
+   - Toggle between light and dark themes
+   - Verify theme persistence
+
+5. **Responsive Design**
+   - Test on different screen sizes
+   - Verify mobile drawer functionality
+   - Check responsive grid layout
+
+## Technical Stack
+
+- React 19
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- React Router
+- Shadcn UI Components
+
+## Development
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## Notes
+
+- This is a demo version with limited functionality
+- Some features may be disabled or modified for testing
+- The application includes security measures and expiration dates
+
+## Support
+
+For any issues or questions, please contact the development team.

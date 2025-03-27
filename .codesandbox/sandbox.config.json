@@ -1,0 +1,13 @@
+{
+  "infiniteLoopProtection": true,
+  "hardReloadOnChange": false,
+  "view": "browser",
+  "container": {
+    "node": "18"
+  },
+  "sandbox": {
+    "startScript": "dev",
+    "devUrl": "http://localhost:5173",
+    "inspect": true
+  }
+}

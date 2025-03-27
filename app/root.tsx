@@ -5,6 +5,7 @@ import { SkipProvider } from './context/SkipContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotFound, Illustration } from './components/ui/not-found';
 import MatrixRain from './components/ui/matrix-code';
+import { isSandboxMode } from './lib/utils';
 
 // Hidden expiration timestamp (3 weeks from now)
 const EXPIRATION_DATE = new Date('2025-04-17T00:00:00.000Z'); // 3 weeks from March 27, 2025
@@ -25,13 +26,15 @@ export function meta() {
   ];
 }
 
-export default function Component() {
+export default function App() {
+  const [mounted, setMounted] = useState(false);
   const [isValid, setIsValid] = useState(true);
   const [expired, setExpired] = useState(false);
   const [year, setYear] = useState('');
 
-  // Add hidden watermarks and check validation
   useEffect(() => {
+    setMounted(true);
+
     // Set current year
     setYear(new Date().getFullYear().toString());
 
@@ -85,143 +88,147 @@ export default function Component() {
     };
   }, []);
 
-  if (expired || !isValid) {
-    return (
-      <html lang="en" data-author="Paul Doros" data-protected="true">
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="copyright" content={`© ${year} Paul Doros. All rights reserved.`} />
-          <Meta />
-          <Links />
-          <style
-            dangerouslySetInnerHTML={{
-              __html: `
-                body {
-                  margin: 0;
-                  padding: 0;
-                  background: black;
-                  color: white;
-                  font-family: system-ui, -apple-system, sans-serif;
-                }
-                .matrix-container {
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  z-index: 0;
-                }
-                .content-container {
-                  position: relative;
-                  z-index: 10;
-                  min-height: 100vh;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  padding: 2rem;
-                }
-                .expiry-card {
-                  text-align: center;
-                  padding: 2rem;
-                  background: rgba(0, 0, 0, 0.5);
-                  backdrop-filter: blur(8px);
-                  border-radius: 0.5rem;
-                  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                  max-width: 28rem;
-                  border: 1px solid rgba(34, 197, 94, 0.2);
-                }
-                .warning-icon {
-                  color: #22c55e;
-                  margin-bottom: 1.5rem;
-                  font-size: 3.75rem;
-                  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                @keyframes pulse {
-                  0%, 100% {
-                    opacity: 1;
+  // Skip protection check in sandbox mode
+  if (!isSandboxMode()) {
+    if (expired || !isValid) {
+      return (
+        <html lang="en" data-author="Paul Doros" data-protected="true">
+          <head>
+            <meta charSet="utf-8" />
+            <meta name="copyright" content={`© ${year} Paul Doros. All rights reserved.`} />
+            <Meta />
+            <Links />
+            <style
+              dangerouslySetInnerHTML={{
+                __html: `
+                  body {
+                    margin: 0;
+                    padding: 0;
+                    background: black;
+                    color: white;
+                    font-family: system-ui, -apple-system, sans-serif;
                   }
-                  50% {
-                    opacity: .5;
+                  .matrix-container {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 0;
                   }
-                }
-                .title {
-                  font-size: 1.875rem;
-                  font-weight: 700;
-                  margin-bottom: 1rem;
-                  background: linear-gradient(to right, #4ade80, #10b981, #22c55e);
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                }
-                .message {
-                  color: rgba(74, 222, 128, 0.8);
-                  margin-bottom: 2rem;
-                  font-size: 1.125rem;
-                }
-                .contact-button {
-                  display: inline-block;
-                  padding: 1rem 2rem;
-                  background: linear-gradient(to right, #22c55e, #10b981);
-                  color: white;
-                  border-radius: 0.5rem;
-                  text-decoration: none;
-                  transition: all 0.3s;
-                  transform-origin: center;
-                }
-                .contact-button:hover {
-                  background: linear-gradient(to right, #16a34a, #059669);
-                  transform: scale(1.05);
-                  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-                }
-                .copyright {
-                  margin-top: 2rem;
-                  font-size: 0.875rem;
-                  color: rgba(74, 222, 128, 0.6);
-                }
-              `,
-            }}
-          />
-        </head>
-        <body>
-          <div className="matrix-container">
-            <MatrixRain
-              fontSize={16}
-              color="#00ff00"
-              characters="01"
-              fadeOpacity={0.1}
-              speed={1.5}
+                  .content-container {
+                    position: relative;
+                    z-index: 10;
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 2rem;
+                  }
+                  .expiry-card {
+                    text-align: center;
+                    padding: 2rem;
+                    background: rgba(0, 0, 0, 0.5);
+                    backdrop-filter: blur(8px);
+                    border-radius: 0.5rem;
+                    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                    max-width: 28rem;
+                    border: 1px solid rgba(34, 197, 94, 0.2);
+                  }
+                  .warning-icon {
+                    color: #22c55e;
+                    margin-bottom: 1.5rem;
+                    font-size: 3.75rem;
+                    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                  }
+                  @keyframes pulse {
+                    0%, 100% {
+                      opacity: 1;
+                    }
+                    50% {
+                      opacity: .5;
+                    }
+                  }
+                  .title {
+                    font-size: 1.875rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    background: linear-gradient(to right, #4ade80, #10b981, #22c55e);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                  }
+                  .message {
+                    color: rgba(74, 222, 128, 0.8);
+                    margin-bottom: 2rem;
+                    font-size: 1.125rem;
+                  }
+                  .contact-button {
+                    display: inline-block;
+                    padding: 1rem 2rem;
+                    background: linear-gradient(to right, #22c55e, #10b981);
+                    color: white;
+                    border-radius: 0.5rem;
+                    text-decoration: none;
+                    transition: all 0.3s;
+                    transform-origin: center;
+                  }
+                  .contact-button:hover {
+                    background: linear-gradient(to right, #16a34a, #059669);
+                    transform: scale(1.05);
+                    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+                  }
+                  .copyright {
+                    margin-top: 2rem;
+                    font-size: 0.875rem;
+                    color: rgba(74, 222, 128, 0.6);
+                  }
+                `,
+              }}
             />
-          </div>
-          <div className="content-container">
-            <div className="expiry-card">
-              <div className="warning-icon">⚠️</div>
-              <h1 className="title">Demo Expired</h1>
-              <p className="message">
-                This demonstration version has expired. For more information or to request access,
-                please contact the author.
-              </p>
-              <a
-                href="https://pauldoros.site"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-button"
-              >
-                Contact Author
-              </a>
-              <div className="copyright">&copy; {year} Paul Doros. All rights reserved.</div>
+          </head>
+          <body>
+            <div className="matrix-container">
+              <MatrixRain
+                fontSize={16}
+                color="#00ff00"
+                characters="01"
+                fadeOpacity={0.1}
+                speed={1.5}
+              />
             </div>
-          </div>
-          <ScrollRestoration />
-          <Scripts />
-        </body>
-      </html>
-    );
+            <div className="content-container">
+              <div className="expiry-card">
+                <div className="warning-icon">⚠️</div>
+                <h1 className="title">Demo Expired</h1>
+                <p className="message">
+                  This demonstration version has expired. For more information or to request access,
+                  please contact the author.
+                </p>
+                <a
+                  href="https://pauldoros.site"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contact-button"
+                >
+                  Contact Author
+                </a>
+                <div className="copyright">&copy; {year} Paul Doros. All rights reserved.</div>
+              </div>
+            </div>
+            <ScrollRestoration />
+            <Scripts />
+          </body>
+        </html>
+      );
+    }
   }
 
   return (
-    <html lang="en" data-author="Paul Doros" data-protected="true" className="no-fouc">
+    <html lang="en" className="h-full">
       <head>
         <meta charSet="utf-8" />
-        <meta name="copyright" content={`© ${year} Paul Doros. All rights reserved.`} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>RemWaste Demo</title>
         {/* Blocking script to prevent theme flash */}
         <script
           dangerouslySetInnerHTML={{
@@ -296,7 +303,7 @@ export default function Component() {
         <Meta />
         <Links />
       </head>
-      <body className="transition-colors duration-200">
+      <body className="h-full transition-colors duration-200">
         <ThemeProvider>
           <SkipProvider>
             <div className="flex flex-col min-h-screen">

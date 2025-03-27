@@ -135,3 +135,11 @@ declare global {
     _pd_valid?: boolean;
   }
 }
+
+export const isSandboxMode = () => {
+  return (
+    import.meta.env.VITE_SANDBOX_MODE === 'true' ||
+    import.meta.env.VITE_DISABLE_PROTECTION === 'true' ||
+    process.env.SANDBOX_MODE === 'true'
+  );
+};

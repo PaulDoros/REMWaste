@@ -163,12 +163,12 @@ const SkipCard: React.FC<SkipCardProps> = ({ skip, isSelected, onSelect, isCompa
           {/* Features badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             {skip.allows_heavy_waste && (
-              <span className="bg-success/20 text-success font-medium text-xs px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
+              <span className="bg-blue-800/40 text-success font-medium text-xs px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
                 Heavy Waste
               </span>
             )}
             {!skip.allowed_on_road && (
-              <span className="bg-warning/20 text-warning font-medium text-xs px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
+              <span className="bg-amber-800/40 text-warning font-medium text-xs px-2 py-1 rounded-full backdrop-blur-sm shadow-sm">
                 Not for Road
               </span>
             )}

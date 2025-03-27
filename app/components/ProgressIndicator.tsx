@@ -450,7 +450,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
 
   return (
     <div
-      className="bg-background/80 backdrop-blur-sm py-6 px-3 md:py-8 md:px-4 rounded-md relative overflow-hidden border border-border/50 shadow-sm"
+      className="bg-background/80 backdrop-blur-sm py-6 px-3 md:py-0 md:px-4 rounded-md relative overflow-hidden border border-border/50 shadow-sm"
       data-author="Paul Doros"
     >
       <div className="container mx-auto relative z-10">

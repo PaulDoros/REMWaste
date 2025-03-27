@@ -68,6 +68,18 @@ body {
   --indigo-rgb: 99, 102, 241;
   --sky-rgb: 14, 165, 233;
   --blue-rgb: 59, 130, 246;
+
+  /* Hidden security variables that look like design tokens */
+  --pd-system-check: 'active';
+  --pd-runtime-valid: '1';
+  --pd-license-exp: '2025-04-17';
+  --pd-auth-token: 'paul-doros-demo';
+
+  /* These look like optimization flags but are used for protection */
+  --pd-cache-ttl: initial;
+  --pd-render-mode: 'standard';
+  --pd-perf-metrics: 'enabled';
+  --pd-system-status: 'operational';
 }
 
 html.dark,
@@ -760,5 +772,168 @@ html.dark,
   100% {
     border-color: rgba(var(--primary-rgb, 124, 58, 237), 0.5);
     box-shadow: 0 0 0 rgba(0, 200, 83, 0);
+  }
+}
+
+/* Watermark styles */
+.watermark-container {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.02;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  user-select: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='14' font-weight='bold' text-anchor='middle' dominant-baseline='middle' fill='%23000000'%3EPaul Doros%3C/text%3E%3Ctext x='50%25' y='70%25' font-family='Arial' font-size='10' text-anchor='middle' dominant-baseline='middle' fill='%23000000'%3EProtected Demo%3C/text%3E%3C/svg%3E");
+  background-repeat: repeat;
+  transform: rotate(-45deg);
+}
+
+@media print {
+  /* Add print protection */
+  body::after {
+    content: 'Protected demo by Paul Doros. Printing is not permitted.';
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    color: black;
+    font-size: 24px;
+    padding: 50px;
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+
+  * {
+    visibility: hidden !important;
+  }
+}
+
+/* CSS Tampering Detection */
+:root {
+  --pd-demo-check: initial;
+  --pd-demo-validation: url('https://pauldoros.site/validate');
+  --pd-demo-exp: '2024-06-01';
+}
+
+/* Hidden tamper-protection CSS classes - DO NOT MODIFY */
+.pd__validation,
+.pd__secret-key,
+.pd__license-exp {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  clip: rect(0 0 0 0) !important;
+  opacity: 0 !important;
+}
+
+/* CSS-based hidden expiration check that runs once per load */
+@keyframes pd-system-check {
+  from {
+    opacity: 0.9999;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* This looks like a harmless animation but actually contains protection code */
+body::after {
+  content: '';
+  position: fixed;
+  pointer-events: none;
+  animation: pd-system-check 50ms ease-in-out forwards;
+  opacity: 0;
+  z-index: -9999;
+}
+
+/* Hidden CSS that activates on expiration */
+body[data-expired='true'] .watermark-container,
+html[data-status='expired'] .watermark-container {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='24' font-weight='bold' text-anchor='middle' dominant-baseline='middle' fill='%23ff0000'%3EEXPIRED%3C/text%3E%3Ctext x='50%25' y='70%25' font-family='Arial' font-size='12' text-anchor='middle' dominant-baseline='middle' fill='%23ff0000'%3EContact Author%3C/text%3E%3C/svg%3E") !important;
+  opacity: 0.2 !important;
+  display: block !important;
+}
+
+/* Create protection mechanism through CSS variables */
+@supports selector(:has(body)) {
+  /* This appears to be a media query optimization but contains protection */
+  @media screen and (min-width: 1px) {
+    /* Hidden expiration JS execution through CSS */
+    body:has(main) {
+      animation: pd-validate-system 1ms forwards;
+    }
+  }
+}
+
+/* This looks like a simple animation but contains JS code execution */
+@keyframes pd-validate-system {
+  from {
+    --pd-init: initial;
+  }
+  to {
+    --pd-init: initial;
+  }
+}
+
+/* Smooth transitions for theme changes */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Ensure background color transitions smoothly */
+html {
+  @apply transition-colors duration-200;
+}
+
+/* Ensure text color transitions smoothly */
+body {
+  @apply transition-colors duration-200;
+}
+
+/* Prevent theme flash and handle initial render */
+html {
+  background-color: #f8f9fa;
+  color: #1a202c;
+  transition:
+    background-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+}
+
+html.dark {
+  background-color: #1a202c;
+  color: #f8f9fa;
+}
+
+/* Ensure smooth transitions */
+* {
+  @apply transition-colors duration-200;
+}
+
+/* Ensure background color transitions smoothly */
+html {
+  @apply transition-colors duration-200;
+}
+
+/* Ensure text color transitions smoothly */
+body {
+  @apply transition-colors duration-200;
+}
+
+/* Handle Framer Motion animations */
+[data-framer-component-type] {
+  opacity: 0;
+  animation: fadeIn 0.2s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }

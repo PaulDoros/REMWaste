@@ -1,6 +1,5 @@
-'use client';
-
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { MovingBorder } from './ui/moving-border';
 import { Button } from './ui/button';
 import {
   Drawer,

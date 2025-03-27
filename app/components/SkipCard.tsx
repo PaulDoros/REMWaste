@@ -1,6 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import classNames from 'classnames';
 import type { Skip } from '../constants/skips';
 import { Button, MovingBorder } from './ui/moving-border';
 import { cn } from '../lib/utils';

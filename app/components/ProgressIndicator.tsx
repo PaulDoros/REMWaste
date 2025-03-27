@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import { SparklesCore } from './ui/sparkles';
@@ -15,36 +15,53 @@ interface ProgressIndicatorProps {
   steps: Step[];
 }
 
-const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
-  const getIconForStep = (step: Step, index: number) => {
-    if (step.isCompleted) {
-      return (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      );
-    }
+// Create a memoized pulse animation component to prevent re-rendering
+const PulseAnimation = React.memo(({ isActive }: { isActive: boolean | undefined }) => {
+  if (!isActive) return null;
 
-    if (step.isActive) {
-      return <span className="text-sm font-semibold">{index + 1}</span>;
-    }
+  return (
+    <>
+      <motion.div
+        className="absolute inset-0 rounded-full border-2 border-primary/30"
+        animate={{
+          scale: [1, 1.4, 1],
+          opacity: [0.7, 0.4, 0.7],
+        }}
+        transition={{
+          duration: 2.5,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'loop',
+        }}
+      />
+      <motion.div
+        className="absolute inset-0 rounded-full border border-primary/20"
+        animate={{
+          scale: [1, 1.7, 1],
+          opacity: [0.5, 0.3, 0.5],
+        }}
+        transition={{
+          duration: 3,
+          ease: 'easeInOut',
+          repeat: Infinity,
+          repeatType: 'loop',
+          delay: 0.2,
+        }}
+      />
+    </>
+  );
+});
 
-    return <span className="text-sm">{index + 1}</span>;
-  };
+PulseAnimation.displayName = 'PulseAnimation';
 
-  // Map step IDs to specific icons
-  const getStepIcon = (stepId: string) => {
-    switch (stepId) {
+// Memoize the step icon component to prevent re-rendering
+const StepIcon = React.memo(({ stepId }: { stepId: string }) => {
+  const getStepIcon = (id: string) => {
+    switch (id) {
       case 'postcode':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -67,7 +84,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       case 'waste-type':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -84,7 +101,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       case 'select-skip':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -101,7 +118,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       case 'permit-check':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -118,7 +135,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       case 'choose-date':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -135,7 +152,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
       case 'payment':
         return (
           <svg
-            className="w-5 h-5"
+            className="w-4 h-4 md:w-5 md:h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -151,114 +168,306 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
         );
 
       default:
-        return <span className="text-sm">{steps.findIndex(s => s.id === stepId) + 1}</span>;
+        return <span className="text-sm">{id}</span>;
     }
   };
 
-  const getStepLinkForId = (stepId: string) => {
-    switch (stepId) {
-      case 'postcode':
-        return '/postcode';
-      case 'waste-type':
-        return '/waste-type';
-      case 'select-skip':
-        return '/skips';
-      case 'permit-check':
-        return '/confirm';
-      case 'choose-date':
-        return '/date';
-      case 'payment':
-        return '/payment';
-      default:
-        return '';
+  return getStepIcon(stepId);
+});
+
+StepIcon.displayName = 'StepIcon';
+
+// Memoize the individual step to prevent re-rendering
+const Step = React.memo(
+  ({
+    step,
+    index,
+    activeIndex,
+    totalSteps,
+  }: {
+    step: Step;
+    index: number;
+    activeIndex: number;
+    totalSteps: number;
+  }) => {
+    const isClickable = step.isCompleted;
+    const stepPosition = `${(index / (totalSteps - 1)) * 100}%`;
+
+    const getLinkForStep = (stepId: string) => {
+      switch (stepId) {
+        case 'postcode':
+          return '/postcode';
+        case 'waste-type':
+          return '/waste-type';
+        case 'select-skip':
+          return '/skips';
+        case 'permit-check':
+          return '/confirm';
+        case 'choose-date':
+          return '/date';
+        case 'payment':
+          return '/payment';
+        default:
+          return '';
+      }
+    };
+
+    const stepLink = getLinkForStep(step.id);
+
+    const stepContent = (
+      <motion.div
+        className={`flex flex-col items-center absolute transform -translate-x-1/2`}
+        style={{ left: stepPosition }}
+        initial={{ y: 0, opacity: 1 }}
+        animate={{
+          y: 0,
+          opacity: 1,
+          scale: step.isActive ? 1.1 : 1,
+        }}
+        transition={{
+          duration: 0.4,
+          type: 'spring',
+          stiffness: 200,
+          damping: 20,
+        }}
+      >
+        <motion.div
+          className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
+            step.isActive
+              ? 'border-primary bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+              : step.isCompleted
+                ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/10'
+                : 'border-muted-foreground/30 bg-background text-muted-foreground'
+          }`}
+          initial={false}
+          animate={{
+            scale: step.isActive ? 1.1 : 1,
+            borderWidth: step.isActive ? 3 : 2,
+          }}
+          whileHover={isClickable ? { scale: 1.1, y: -3 } : {}}
+          whileTap={isClickable ? { scale: 0.95 } : {}}
+          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+        >
+          <StepIcon stepId={step.id} />
+          <PulseAnimation isActive={step.isActive} />
+        </motion.div>
+
+        <motion.span
+          className={`mt-2 text-xs text-center whitespace-nowrap font-medium ${
+            step.isActive
+              ? 'text-foreground font-semibold'
+              : step.isCompleted
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+          }`}
+          animate={{
+            opacity: step.isActive ? 1 : 0.8,
+            y: step.isActive ? 0 : 2,
+            scale: step.isActive ? 1.05 : 1,
+          }}
+        >
+          {step.label}
+        </motion.span>
+      </motion.div>
+    );
+
+    return (
+      <React.Fragment>
+        {isClickable && stepLink ? (
+          <Link to={stepLink} className="block h-16 w-0">
+            {stepContent}
+          </Link>
+        ) : (
+          <div className="block h-16 w-0">{stepContent}</div>
+        )}
+      </React.Fragment>
+    );
+  }
+);
+
+Step.displayName = 'Step';
+
+const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
+  // Get current active step index
+  const activeIndex = steps.findIndex(step => step.isActive);
+
+  // Mobile-specific render - showing only relevant steps
+  const renderMobileSteps = () => {
+    // Show only the active step, previous step (if exists), and next step (if exists)
+    const visibleSteps = [];
+
+    // Add previous step if exists
+    if (activeIndex > 0) {
+      visibleSteps.push(steps[activeIndex - 1]);
     }
+
+    // Add current step
+    visibleSteps.push(steps[activeIndex]);
+
+    // Add next step if exists
+    if (activeIndex < steps.length - 1) {
+      visibleSteps.push(steps[activeIndex + 1]);
+    }
+
+    return (
+      <div className="flex items-center justify-center space-x-4 sm:space-x-6 relative">
+        {/* Progress line */}
+        <div className="absolute top-1/4 left-1/4 right-1/4 h-[2px] bg-primary/20 -translate-y-1/2"></div>
+
+        {visibleSteps.map((step, idx) => {
+          const isClickable = step.isCompleted;
+          const stepLink = (() => {
+            switch (step.id) {
+              case 'postcode':
+                return '/postcode';
+              case 'waste-type':
+                return '/waste-type';
+              case 'select-skip':
+                return '/skips';
+              case 'permit-check':
+                return '/confirm';
+              case 'choose-date':
+                return '/date';
+              case 'payment':
+                return '/payment';
+              default:
+                return '';
+            }
+          })();
+
+          const stepContent = (
+            <motion.div
+              key={step.id}
+              className={`flex flex-col items-center relative z-10 ${
+                step.isActive
+                  ? 'text-primary'
+                  : step.isCompleted
+                    ? 'text-primary cursor-pointer'
+                    : 'text-muted-foreground'
+              }`}
+              whileHover={isClickable ? { scale: 1.05 } : {}}
+              whileTap={isClickable ? { scale: 0.95 } : {}}
+            >
+              <motion.div
+                className={`flex items-center justify-center w-9 h-9 rounded-full border-2 transition-all duration-300 ${
+                  step.isActive
+                    ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20'
+                    : step.isCompleted
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'border-primary/10 bg-secondary text-muted-foreground'
+                }`}
+                initial={{ scale: 0.9, opacity: 0.8 }}
+                animate={{
+                  scale: step.isActive ? 1.05 : 1,
+                  opacity: 1,
+                }}
+                transition={{ duration: 0.3, type: 'spring', stiffness: 200 }}
+              >
+                <StepIcon stepId={step.id} />
+                <PulseAnimation isActive={step.isActive} />
+              </motion.div>
+              <span
+                className={`mt-2 text-xs text-center font-medium ${
+                  step.isActive
+                    ? 'text-foreground'
+                    : step.isCompleted
+                      ? 'text-foreground'
+                      : 'text-muted-foreground'
+                }`}
+              >
+                {step.label}
+              </span>
+
+              {/* Step indicator for context */}
+              <span className="mt-1 text-[10px] text-muted-foreground">
+                {steps.findIndex(s => s.id === step.id) + 1}/{steps.length}
+              </span>
+            </motion.div>
+          );
+
+          return isClickable && stepLink ? (
+            <Link key={step.id} to={stepLink}>
+              {stepContent}
+            </Link>
+          ) : (
+            <div key={step.id}>{stepContent}</div>
+          );
+        })}
+
+        {/* Current step indicator */}
+        <div className="absolute -bottom-5 left-0 right-0 text-center">
+          <div className="inline-flex gap-1">
+            {steps.map((_, idx) => (
+              <div
+                key={idx}
+                className={`w-1.5 h-1.5 rounded-full ${
+                  idx === activeIndex
+                    ? 'bg-primary'
+                    : idx < activeIndex
+                      ? 'bg-primary/40'
+                      : 'bg-muted-foreground/20'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
+
+  // Desktop render - showing all steps
+  const renderDesktopSteps = useMemo(() => {
+    return (
+      <div className="flex items-center justify-center relative">
+        {/* Progress line - now with gradient and animation */}
+        <div className="absolute top-1/3 left-0 right-0 h-[3px] bg-border/40 -translate-y-1/2"></div>
+
+        {/* Animated progress line */}
+        <motion.div
+          className="absolute top-1/3 left-0 h-[3px] bg-primary -translate-y-1/2 origin-left"
+          initial={{ width: '0%' }}
+          animate={{
+            width: `${(activeIndex / (steps.length - 1)) * 100}%`,
+          }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        />
+
+        {/* Steps with proper spacing */}
+        <div className="flex items-center justify-between space-x-1 md:space-x-1 lg:space-x-1 w-full mx-auto relative z-10">
+          {steps.map((step, index) => (
+            <Step
+              key={step.id}
+              step={step}
+              index={index}
+              activeIndex={activeIndex}
+              totalSteps={steps.length}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }, [steps, activeIndex]); // Only re-render when steps or activeIndex change
 
   return (
     <div
-      className="bg-secondary py-5 px-3 md:py-6 md:px-4 shadow-md rounded-md relative overflow-hidden"
+      className="bg-background/80 backdrop-blur-sm py-6 px-3 md:py-0 md:px-4 rounded-md relative overflow-hidden border border-border/50 shadow-sm"
       data-author="Paul Doros"
     >
       <div className="container mx-auto relative z-10">
-        <div className="flex justify-center relative">
-          {/* Progress line */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-muted -translate-y-1/2"></div>
+        {/* Mobile view (simplified) */}
+        <div className="sm:hidden">{renderMobileSteps()}</div>
 
-          {/* Steps container with horizontal scroll on mobile */}
-          <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 lg:space-x-6 px-2 md:px-0 overflow-x-auto no-scrollbar max-w-screen-lg mx-auto">
-            {steps.map((step, index) => {
-              const isClickable = step.isCompleted;
-              const stepLink = getStepLinkForId(step.id);
-              const isLast = index === steps.length - 1;
-
-              const stepContent = (
-                <motion.div
-                  className={`flex flex-col items-center relative z-10 ${
-                    step.isActive
-                      ? 'text-primary'
-                      : step.isCompleted
-                        ? 'text-primary cursor-pointer'
-                        : 'text-muted-foreground'
-                  }`}
-                  whileHover={isClickable ? { scale: 1.05 } : {}}
-                  whileTap={isClickable ? { scale: 0.95 } : {}}
-                >
-                  <div
-                    className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-all duration-300 ${
-                      step.isActive
-                        ? 'border-primary bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                        : step.isCompleted
-                          ? 'border-primary bg-primary text-primary-foreground'
-                          : 'border-muted-foreground bg-secondary text-muted-foreground'
-                    }`}
-                  >
-                    {getStepIcon(step.id)}
-                  </div>
-                  <span
-                    className={`mt-2 text-[10px] sm:text-xs text-center whitespace-nowrap px-1 max-w-[80px] sm:max-w-none ${
-                      step.isActive
-                        ? 'text-foreground font-medium'
-                        : step.isCompleted
-                          ? 'text-foreground font-medium'
-                          : 'text-muted-foreground'
-                    }`}
-                  >
-                    {step.label}
-                  </span>
-                </motion.div>
-              );
-
-              const content =
-                isClickable && stepLink ? (
-                  <Link key={step.id} to={stepLink} className="block">
-                    {stepContent}
-                  </Link>
-                ) : (
-                  <div>{stepContent}</div>
-                );
-
-              return (
-                <div key={step.id} className="flex items-center">
-                  {content}
-                  {!isLast && (
-                    <div className="hidden sm:block w-4 md:w-6 lg:w-8 h-0.5 bg-transparent mx-1 md:mx-2">
-                      {/* Spacer */}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        {/* Desktop view (full) */}
+        <div className="hidden sm:block relative pt-6 pb-4">{renderDesktopSteps}</div>
       </div>
 
       {/* Sparkles and gradient effects */}
       <div className="absolute top-0 left-0 right-0 h-full w-full overflow-hidden pointer-events-none">
         {/* Gradients */}
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-[2px] w-3/4 blur-sm" />
-        <div className="absolute inset-x-20 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-px w-3/4" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[3px] w-1/4 blur-sm" />
-        <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
+        <div className="absolute inset-x-0 left-1/2 -translate-x-1/2 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-[2px] w-3/4 blur-sm" />
+        <div className="absolute inset-x-0 left-1/2 -translate-x-1/2 top-0 bg-gradient-to-r from-transparent via-primary to-transparent h-px w-3/4" />
+        <div className="absolute inset-x-0 left-1/2 -translate-x-1/2 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-[3px] w-1/4 blur-sm" />
+        <div className="absolute inset-x-0 left-1/2 -translate-x-1/2 top-0 bg-gradient-to-r from-transparent via-sky-500 to-transparent h-px w-1/4" />
 
         {/* Core sparkles component */}
         <SparklesCore
@@ -266,7 +475,7 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
           background="transparent"
           minSize={0.2}
           maxSize={0.6}
-          particleDensity={15}
+          particleDensity={12}
           className="w-full h-full opacity-40"
           particleColor="var(--primary)"
           speed={0.2}
@@ -276,4 +485,4 @@ const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({ steps }) => {
   );
 };
 
-export default ProgressIndicator;
+export default React.memo(ProgressIndicator);

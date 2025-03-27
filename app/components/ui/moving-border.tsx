@@ -1,13 +1,8 @@
-'use client';
-import React, { useRef } from 'react';
-import {
-  motion,
-  useAnimationFrame,
-  useMotionTemplate,
-  useMotionValue,
-  useTransform,
-} from 'framer-motion';
-import { cn } from '../../lib/utils';
+import { cn } from '~/lib/utils';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useAnimationFrame, useMotionTemplate, useMotionValue, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 
 export function Button({
   borderRadius = '1.75rem',
@@ -68,15 +63,15 @@ export function Button({
 export const MovingBorder = ({
   children,
   duration = 2000,
-  rx,
+  rx = '30',
   ry,
-  ...otherProps
+  className,
 }: {
   children: React.ReactNode;
   duration?: number;
   rx?: string;
   ry?: string;
-  [key: string]: any;
+  className?: string;
 }) => {
   const pathRef = useRef<SVGRectElement>(null);
   const progress = useMotionValue<number>(0);
@@ -118,7 +113,6 @@ export const MovingBorder = ({
         className="absolute h-full w-full"
         width="100%"
         height="100%"
-        {...otherProps}
       >
         <rect fill="none" width="100%" height="100%" rx={rx} ry={ry} ref={pathRef} />
       </svg>

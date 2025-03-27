@@ -3,7 +3,11 @@ import { useTheme } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
 
 const ThemeToggle: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
   return (
     <button
@@ -27,7 +31,7 @@ const ThemeToggle: React.FC = () => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-5 h-5"
+            className="w-5 h-5 text-yellow-400"
           >
             <path
               strokeLinecap="round"

@@ -14,7 +14,8 @@
           "dev": "vite",
           "build": "tsc && vite build",
           "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-          "preview": "vite preview"
+          "preview": "vite preview",
+          "typecheck": "tsc --noEmit"
         },
         "dependencies": {
           "@radix-ui/react-accordion": "^1.2.3",
@@ -66,7 +67,7 @@
       }
     },
     "vite.config.ts": {
-      "content": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [react(), tsconfigPaths()],\n  resolve: {\n    alias: {\n      '~': '/app'\n    }\n  }\n});"
+      "content": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\nimport { reactRouter } from '@react-router/dev/vite';\n\nexport default defineConfig({\n  plugins: [\n    react(),\n    tsconfigPaths(),\n    reactRouter()\n  ],\n  resolve: {\n    alias: {\n      '~': '/app'\n    }\n  },\n  server: {\n    port: 5173,\n    host: true\n  }\n});"
     },
     "tsconfig.json": {
       "content": {

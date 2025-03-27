@@ -88,6 +88,24 @@ export default function App() {
     };
   }, []);
 
+  // Skip all protection checks in sandbox mode
+  if (isSandboxMode()) {
+    return (
+      <html lang="en" className="h-full">
+        <head>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <title>RemWaste Demo</title>
+        </head>
+        <body className="h-full">
+          <ThemeProvider>
+            <Outlet />
+          </ThemeProvider>
+        </body>
+      </html>
+    );
+  }
+
   // Skip protection check in sandbox mode
   if (!isSandboxMode()) {
     if (expired || !isValid) {

@@ -11,9 +11,9 @@
         "version": "0.1.0",
         "type": "module",
         "scripts": {
-          "dev": "vite --host 0.0.0.0",
-          "start": "vite --host 0.0.0.0",
-          "build": "tsc && vite build",
+          "dev": "react-router build && react-router-serve ./build/server/index.js",
+          "start": "react-router build && react-router-serve ./build/server/index.js",
+          "build": "react-router build",
           "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
           "preview": "vite preview",
           "typecheck": "tsc --noEmit"
@@ -68,7 +68,7 @@
       }
     },
     "vite.config.ts": {
-      "content": "import { defineConfig, loadEnv } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\nimport { reactRouter } from '@react-router/dev/vite';\n\nexport default defineConfig(({ mode }) => {\n  const env = loadEnv(mode, process.cwd(), '');\n  return {\n    plugins: [\n      react(),\n      tsconfigPaths(),\n      reactRouter()\n    ],\n    resolve: {\n      alias: {\n        '~': '/app'\n      }\n    },\n    server: {\n      port: 5173,\n      host: '0.0.0.0',\n      strictPort: true,\n      hmr: {\n        port: 5173\n      },\n      watch: {\n        usePolling: true\n      }\n    },\n    define: {\n      'process.env.NODE_ENV': JSON.stringify(mode),\n      'process.env.SANDBOX_MODE': 'true'\n    }\n  };\n});"
+      "content": "import { defineConfig, loadEnv } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\nimport { reactRouter } from '@react-router/dev/vite';\n\nexport default defineConfig(({ mode }) => {\n  const env = loadEnv(mode, process.cwd(), '');\n  return {\n    plugins: [\n      react(),\n      tsconfigPaths(),\n      reactRouter()\n    ],\n    resolve: {\n      alias: {\n        '~': '/app'\n      }\n    },\n    server: {\n      port: 5173,\n      host: '0.0.0.0',\n      strictPort: true\n    },\n    define: {\n      'process.env.NODE_ENV': JSON.stringify(mode),\n      'process.env.SANDBOX_MODE': 'true'\n    }\n  };\n});"
     },
     ".env": {
       "content": "VITE_SANDBOX_MODE=true\nVITE_DISABLE_PROTECTION=true"

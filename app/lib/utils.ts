@@ -137,9 +137,24 @@ declare global {
 }
 
 export const isSandboxMode = () => {
-  return (
+  // Check for CodeSandbox environment
+  if (window.location.hostname.includes('csb.app')) {
+    return true;
+  }
+
+  // Check for environment variables
+  if (
     import.meta.env.VITE_SANDBOX_MODE === 'true' ||
     import.meta.env.VITE_DISABLE_PROTECTION === 'true' ||
     process.env.SANDBOX_MODE === 'true'
-  );
+  ) {
+    return true;
+  }
+
+  // Check for development environment
+  if (import.meta.env.DEV) {
+    return true;
+  }
+
+  return false;
 };

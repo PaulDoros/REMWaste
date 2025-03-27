@@ -1,0 +1,48 @@
+{
+  "template": "vite",
+  "container": {
+    "node": "18"
+  },
+  "files": {
+    "app/app.css": {
+      "content": "@tailwind base;\n@tailwind components;\n@tailwind utilities;\n\n@layer base {\n  :root {\n    --background: 0 0% 100%;\n    --foreground: 240 10% 3.9%;\n    --card: 0 0% 100%;\n    --card-foreground: 240 10% 3.9%;\n    --popover: 0 0% 100%;\n    --popover-foreground: 240 10% 3.9%;\n    --primary: 240 5.9% 10%;\n    --primary-foreground: 0 0% 98%;\n    --secondary: 240 4.8% 95.9%;\n    --secondary-foreground: 240 5.9% 10%;\n    --muted: 240 4.8% 95.9%;\n    --muted-foreground: 240 3.8% 46.1%;\n    --accent: 240 4.8% 95.9%;\n    --accent-foreground: 240 5.9% 10%;\n    --destructive: 0 84.2% 60.2%;\n    --destructive-foreground: 0 0% 98%;\n    --border: 240 5.9% 90%;\n    --input: 240 5.9% 90%;\n    --ring: 240 5.9% 10%;\n    --radius: 0.5rem;\n  }\n\n  .dark {\n    --background: 240 10% 3.9%;\n    --foreground: 0 0% 98%;\n    --card: 240 10% 3.9%;\n    --card-foreground: 0 0% 98%;\n    --popover: 240 10% 3.9%;\n    --popover-foreground: 0 0% 98%;\n    --primary: 0 0% 98%;\n    --primary-foreground: 240 5.9% 10%;\n    --secondary: 240 3.7% 15.9%;\n    --secondary-foreground: 0 0% 98%;\n    --muted: 240 3.7% 15.9%;\n    --muted-foreground: 240 5% 64.9%;\n    --accent: 240 3.7% 15.9%;\n    --accent-foreground: 0 0% 98%;\n    --destructive: 0 62.8% 30.6%;\n    --destructive-foreground: 0 0% 98%;\n    --border: 240 3.7% 15.9%;\n    --input: 240 3.7% 15.9%;\n    --ring: 240 4.9% 83.9%;\n  }\n}\n\n@layer base {\n  * {\n    @apply border-border;\n  }\n  body {\n    @apply bg-background text-foreground;\n  }\n}",
+      "isBinary": false
+    },
+    "app/root.tsx": {
+      "content": "import { StrictMode } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport { BrowserRouter } from 'react-router-dom';\nimport App from './App';\nimport './app.css';\n\nconst root = createRoot(document.getElementById('root')!);\n\nroot.render(\n  <StrictMode>\n    <BrowserRouter>\n      <App />\n    </BrowserRouter>\n  </StrictMode>\n);",
+      "isBinary": false
+    },
+    "app/App.tsx": {
+      "content": "import { Routes, Route } from 'react-router-dom';\nimport Component from './routes/skips';\n\nexport default function App() {\n  return (\n    <Routes>\n      <Route path='/' element={<Component params={{}} />} />\n    </Routes>\n  );\n}",
+      "isBinary": false
+    },
+    "index.html": {
+      "content": "<!DOCTYPE html>\n<html lang='en'>\n  <head>\n    <meta charset='UTF-8' />\n    <meta name='viewport' content='width=device-width, initial-scale=1.0' />\n    <title>RemWaste Demo</title>\n  </head>\n  <body>\n    <div id='root'></div>\n    <script type='module' src='/app/root.tsx'></script>\n  </body>\n</html>",
+      "isBinary": false
+    },
+    "package.json": {
+      "content": "{\n  \"name\": \"remwaste-demo\",\n  \"private\": true,\n  \"version\": \"0.0.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"tsc && vite build\",\n    \"lint\": \"eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0\",\n    \"preview\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"@radix-ui/react-accordion\": \"^1.2.3\",\n    \"@radix-ui/react-checkbox\": \"^1.1.4\",\n    \"@radix-ui/react-radio-group\": \"^1.2.3\",\n    \"@radix-ui/react-slot\": \"^1.1.2\",\n    \"@react-router/fs-routes\": \"^7.4.0\",\n    \"@react-router/node\": \"^7.4.0\",\n    \"@react-router/serve\": \"^7.4.0\",\n    \"@shadcn/ui\": \"^0.0.4\",\n    \"@tsparticles/react\": \"^3.0.0\",\n    \"@tsparticles/slim\": \"^3.8.1\",\n    \"class-variance-authority\": \"^0.7.1\",\n    \"classnames\": \"^2.5.1\",\n    \"clsx\": \"^2.1.1\",\n    \"framer-motion\": \"^12.6.1\",\n    \"isbot\": \"^5.1.17\",\n    \"lucide-react\": \"^0.484.0\",\n    \"react\": \"^19.0.0\",\n    \"react-dom\": \"^19.0.0\",\n    \"react-router\": \"^7.4.0\",\n    \"react-router-dom\": \"^7.4.0\",\n    \"recharts\": \"^2.15.1\",\n    \"tailwind-merge\": \"^3.0.2\",\n    \"tsparticles\": \"^3.8.1\",\n    \"tw-animate-css\": \"^1.2.4\",\n    \"vaul\": \"^1.1.2\"\n  },\n  \"devDependencies\": {\n    \"@react-router/dev\": \"^7.4.0\",\n    \"@tailwindcss/vite\": \"^4.0.0\",\n    \"@types/node\": \"^20\",\n    \"@types/react\": \"^19.0.1\",\n    \"@types/react-dom\": \"^19.0.1\",\n    \"autoprefixer\": \"^10.4.21\",\n    \"postcss\": \"^8.5.3\",\n    \"prettier\": \"^3.5.3\",\n    \"react-router-devtools\": \"^1.1.0\",\n    \"tailwindcss\": \"^4.0.17\",\n    \"typescript\": \"^5.7.2\",\n    \"vite\": \"^5.4.11\",\n    \"vite-tsconfig-paths\": \"^5.1.4\"\n  }\n}",
+      "isBinary": false
+    },
+    "postcss.config.js": {
+      "content": "export default {\n  plugins: {\n    tailwindcss: {},\n    autoprefixer: {},\n  },\n}",
+      "isBinary": false
+    },
+    "tailwind.config.js": {
+      "content": "/** @type {import('tailwindcss').Config} */\nexport default {\n  darkMode: ['class'],\n  content: ['./app/**/*.{js,jsx,ts,tsx}'],\n  theme: {\n    container: {\n      center: true,\n      padding: '2rem',\n      screens: {\n        '2xl': '1400px',\n      },\n    },\n    extend: {\n      colors: {\n        border: 'hsl(var(--border))',\n        input: 'hsl(var(--input))',\n        ring: 'hsl(var(--ring))',\n        background: 'hsl(var(--background))',\n        foreground: 'hsl(var(--foreground))',\n        primary: {\n          DEFAULT: 'hsl(var(--primary))',\n          foreground: 'hsl(var(--primary-foreground))',\n        },\n        secondary: {\n          DEFAULT: 'hsl(var(--secondary))',\n          foreground: 'hsl(var(--secondary-foreground))',\n        },\n        destructive: {\n          DEFAULT: 'hsl(var(--destructive))',\n          foreground: 'hsl(var(--destructive-foreground))',\n        },\n        muted: {\n          DEFAULT: 'hsl(var(--muted))',\n          foreground: 'hsl(var(--muted-foreground))',\n        },\n        accent: {\n          DEFAULT: 'hsl(var(--accent))',\n          foreground: 'hsl(var(--accent-foreground))',\n        },\n        popover: {\n          DEFAULT: 'hsl(var(--popover))',\n          foreground: 'hsl(var(--popover-foreground))',\n        },\n        card: {\n          DEFAULT: 'hsl(var(--card))',\n          foreground: 'hsl(var(--card-foreground))',\n        },\n      },\n      borderRadius: {\n        lg: 'var(--radius)',\n        md: 'calc(var(--radius) - 2px)',\n        sm: 'calc(var(--radius) - 4px)',\n      },\n      keyframes: {\n        'accordion-down': {\n          from: { height: '0' },\n          to: { height: 'var(--radix-accordion-content-height)' },\n        },\n        'accordion-up': {\n          from: { height: 'var(--radix-accordion-content-height)' },\n          to: { height: '0' },\n        },\n      },\n      animation: {\n        'accordion-down': 'accordion-down 0.2s ease-out',\n        'accordion-up': 'accordion-up 0.2s ease-out',\n      },\n    },\n  },\n  plugins: [require('tailwindcss-animate')],\n}",
+      "isBinary": false
+    },
+    "tsconfig.json": {
+      "content": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2020\",\n    \"useDefineForClassFields\": true,\n    \"lib\": [\"ES2020\", \"DOM\", \"DOM.Iterable\"],\n    \"module\": \"ESNext\",\n    \"skipLibCheck\": true,\n    \"moduleResolution\": \"bundler\",\n    \"allowImportingTsExtensions\": true,\n    \"resolveJsonModule\": true,\n    \"isolatedModules\": true,\n    \"noEmit\": true,\n    \"jsx\": \"react-jsx\",\n    \"strict\": true,\n    \"noUnusedLocals\": true,\n    \"noUnusedParameters\": true,\n    \"noFallthroughCasesInSwitch\": true,\n    \"baseUrl\": \".\",\n    \"paths\": {\n      \"~/*\": [\"./app/*\"]\n    }\n  },\n  \"include\": [\"app\"],\n  \"references\": [{ \"path\": \"./tsconfig.node.json\" }]\n}",
+      "isBinary": false
+    },
+    "tsconfig.node.json": {
+      "content": "{\n  \"compilerOptions\": {\n    \"composite\": true,\n    \"skipLibCheck\": true,\n    \"module\": \"ESNext\",\n    \"moduleResolution\": \"bundler\",\n    \"allowSyntheticDefaultImports\": true\n  },\n  \"include\": [\"vite.config.ts\"]\n}",
+      "isBinary": false
+    },
+    "vite.config.ts": {
+      "content": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport tsconfigPaths from 'vite-tsconfig-paths';\n\nexport default defineConfig({\n  plugins: [react(), tsconfigPaths()],\n  resolve: {\n    alias: {\n      '~': '/app',\n    },\n  },\n});",
+      "isBinary": false
+    }
+  }
+}

@@ -27,8 +27,6 @@ type ComponentProps = {
 };
 
 // Hidden security mechanisms
-const VALIDATION_KEY = 'pd_' + btoa('RemWasteSkips').substring(0, 8);
-const projectValidationSignature = 'Paul_Doros_Demo_Protected_c' + new Date().getFullYear();
 const expirationCheck = () => new Date() < new Date('2025-04-17');
 
 // Add window property extension for TypeScript
@@ -79,31 +77,11 @@ export default function Component({ params }: ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { selectedSkip, setSelectedSkip } = useSkipContext();
 
-  // Hidden security validation
+  // Remove the validation effect
   useEffect(() => {
-    // Validate project and expiration
-    if (!expirationCheck() || !window[btoa('isValid')]) {
-      // Create a delayed redirect for expired demos (will redirect in the future)
-      const checkLicense = () => {
-        try {
-          const validationElement = document.createElement('div');
-          validationElement.className = 'pd__validation';
-          validationElement.dataset.key = VALIDATION_KEY;
-          validationElement.dataset.signature = projectValidationSignature;
-          document.body.appendChild(validationElement);
-
-          // Set a global validation flag (obfuscated)
-          window[btoa('isValid')] = true;
-
-          // Add hidden message in DOM that this is protected
-          console.log('%c• Protected by Paul Doros •', 'color:transparent');
-        } catch (e) {
-          // Silent error
-        }
-      };
-
-      // Delay check to avoid immediate detection
-      setTimeout(checkLicense, Math.random() * 5000 + 3000);
+    // Simple expiration check
+    if (!expirationCheck()) {
+      console.log('Demo expired');
     }
   }, []);
 

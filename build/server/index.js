@@ -1,7 +1,7 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
 import { PassThrough } from "node:stream";
 import { createReadableStreamFromReadable } from "@react-router/node";
-import { ServerRouter, useMatches, useActionData, useLoaderData, useParams, useRouteError, Meta, Links, ScrollRestoration, Scripts, Outlet, Link, useNavigate, redirect, useSearchParams } from "react-router";
+import { ServerRouter, useMatches, useActionData, useLoaderData, useParams, useRouteError, Meta, Links, Outlet, ScrollRestoration, Scripts, Link, useNavigate, redirect, useSearchParams } from "react-router";
 import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import * as React from "react";
@@ -105,9 +105,6 @@ const ThemeContext = createContext({
   setTheme: () => {
   }
 });
-const DEMO_EXPIRATION = "2025-04-17";
-const SIGNATURE_KEY = "pd_" + btoa("ThemeProvider").substring(0, 8);
-const verifyLicense = () => /* @__PURE__ */ new Date() < new Date(DEMO_EXPIRATION);
 function ThemeProvider({ children }) {
   const [theme, setTheme] = useState("system");
   const [mounted, setMounted] = useState(false);
@@ -143,32 +140,6 @@ function ThemeProvider({ children }) {
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, [theme, mounted]);
-  useEffect(() => {
-    try {
-      const securityElement = document.createElement("div");
-      securityElement.style.display = "none";
-      securityElement.setAttribute("data-protected", "true");
-      securityElement.setAttribute("data-signature", SIGNATURE_KEY);
-      securityElement.setAttribute("data-exp", DEMO_EXPIRATION);
-      document.body.appendChild(securityElement);
-      const intervalCheck = setInterval(() => {
-        if (!verifyLicense()) {
-          console.warn("Demo period has ended. Please contact the author for more information.");
-          if (Math.random() < 0.05) {
-            const validationCheck = document.querySelectorAll("[data-signature]");
-            if (validationCheck.length < 1) {
-              window.location.reload();
-            }
-          }
-        }
-      }, 6e4);
-      return () => {
-        clearInterval(intervalCheck);
-        document.body.removeChild(securityElement);
-      };
-    } catch (e) {
-    }
-  }, []);
   return /* @__PURE__ */ jsx(ThemeContext.Provider, { value: { theme, setTheme }, children });
 }
 function useTheme() {
@@ -442,7 +413,6 @@ function NotFound({
   ] });
 }
 const EXPIRATION_DATE = /* @__PURE__ */ new Date("2025-04-17T00:00:00.000Z");
-const PROJECT_ID = "pd_" + btoa("RemWasteDemo").substring(0, 8);
 function links() {
   return [];
 }
@@ -457,274 +427,61 @@ function meta() {
     content: "Paul Doros"
   }, {
     name: "description",
-    content: "Skip hire selection demo. Protected intellectual property."
+    content: "Skip hire selection demo."
   }];
 }
 const root = withComponentProps(function Component() {
-  const [isValid, setIsValid] = useState(true);
   const [expired, setExpired] = useState(false);
   const [year, setYear] = useState("");
   useEffect(() => {
     setYear((/* @__PURE__ */ new Date()).getFullYear().toString());
-    console.log("%c⚠️ PROTECTED CODE ⚠️\n%cThis application is protected intellectual property of Paul Doros.\nUnauthorized use, modification, or distribution is prohibited.\nContact: https://pauldoros.site", "color: #ff0000; font-size: 14px; font-weight: bold;", "color: #444; font-size: 12px");
-    const validateCode = () => {
-      try {
-        const currentDate = /* @__PURE__ */ new Date();
-        const timestampCheck = currentDate.getTime() < EXPIRATION_DATE.getTime();
-        const hostCheck = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" || window.location.hostname.includes("pauldoros");
-        const validInstance = !!document.querySelector(`[data-instance="${PROJECT_ID}"]`);
-        return timestampCheck && (hostCheck || validInstance);
-      } catch (e) {
-        return false;
-      }
-    };
-    setIsValid(validateCode());
-    setExpired(/* @__PURE__ */ new Date() > EXPIRATION_DATE);
-    const validationTimer = setInterval(() => {
-      setIsValid(validateCode());
+    const checkExpiration = () => {
       setExpired(/* @__PURE__ */ new Date() > EXPIRATION_DATE);
-    }, 1e4);
-    const instanceMarker = document.createElement("meta");
-    instanceMarker.setAttribute("data-instance", PROJECT_ID);
-    instanceMarker.setAttribute("content", "Protected Demo");
-    document.head.appendChild(instanceMarker);
-    return () => {
-      clearInterval(validationTimer);
-      document.head.removeChild(instanceMarker);
     };
+    checkExpiration();
+    const timer = setInterval(checkExpiration, 6e4);
+    return () => clearInterval(timer);
   }, []);
-  if (expired || !isValid) {
+  if (expired) {
     return /* @__PURE__ */ jsxs("html", {
       lang: "en",
-      "data-author": "Paul Doros",
-      "data-protected": "true",
       children: [/* @__PURE__ */ jsxs("head", {
         children: [/* @__PURE__ */ jsx("meta", {
           charSet: "utf-8"
         }), /* @__PURE__ */ jsx("meta", {
           name: "copyright",
           content: `© ${year} Paul Doros. All rights reserved.`
-        }), /* @__PURE__ */ jsx(Meta, {}), /* @__PURE__ */ jsx(Links, {}), /* @__PURE__ */ jsx("style", {
-          dangerouslySetInnerHTML: {
-            __html: `
-                body {
-                  margin: 0;
-                  padding: 0;
-                  background: black;
-                  color: white;
-                  font-family: system-ui, -apple-system, sans-serif;
-                }
-                .matrix-container {
-                  position: fixed;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  height: 100%;
-                  z-index: 0;
-                }
-                .content-container {
-                  position: relative;
-                  z-index: 10;
-                  min-height: 100vh;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  padding: 2rem;
-                }
-                .expiry-card {
-                  text-align: center;
-                  padding: 2rem;
-                  background: rgba(0, 0, 0, 0.5);
-                  backdrop-filter: blur(8px);
-                  border-radius: 0.5rem;
-                  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-                  max-width: 28rem;
-                  border: 1px solid rgba(34, 197, 94, 0.2);
-                }
-                .warning-icon {
-                  color: #22c55e;
-                  margin-bottom: 1.5rem;
-                  font-size: 3.75rem;
-                  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-                @keyframes pulse {
-                  0%, 100% {
-                    opacity: 1;
-                  }
-                  50% {
-                    opacity: .5;
-                  }
-                }
-                .title {
-                  font-size: 1.875rem;
-                  font-weight: 700;
-                  margin-bottom: 1rem;
-                  background: linear-gradient(to right, #4ade80, #10b981, #22c55e);
-                  -webkit-background-clip: text;
-                  -webkit-text-fill-color: transparent;
-                }
-                .message {
-                  color: rgba(74, 222, 128, 0.8);
-                  margin-bottom: 2rem;
-                  font-size: 1.125rem;
-                }
-                .contact-button {
-                  display: inline-block;
-                  padding: 1rem 2rem;
-                  background: linear-gradient(to right, #22c55e, #10b981);
-                  color: white;
-                  border-radius: 0.5rem;
-                  text-decoration: none;
-                  transition: all 0.3s;
-                  transform-origin: center;
-                }
-                .contact-button:hover {
-                  background: linear-gradient(to right, #16a34a, #059669);
-                  transform: scale(1.05);
-                  box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-                }
-                .copyright {
-                  margin-top: 2rem;
-                  font-size: 0.875rem;
-                  color: rgba(74, 222, 128, 0.6);
-                }
-              `
-          }
-        })]
-      }), /* @__PURE__ */ jsxs("body", {
-        children: [/* @__PURE__ */ jsx("div", {
-          className: "matrix-container",
-          children: /* @__PURE__ */ jsx(MatrixRain, {
-            fontSize: 16,
-            color: "#00ff00",
-            characters: "01",
-            fadeOpacity: 0.1,
-            speed: 1.5
-          })
-        }), /* @__PURE__ */ jsx("div", {
-          className: "content-container",
+        }), /* @__PURE__ */ jsx(Meta, {}), /* @__PURE__ */ jsx(Links, {})]
+      }), /* @__PURE__ */ jsx("body", {
+        children: /* @__PURE__ */ jsx("div", {
+          className: "min-h-screen bg-background flex items-center justify-center p-4",
           children: /* @__PURE__ */ jsxs("div", {
-            className: "expiry-card",
-            children: [/* @__PURE__ */ jsx("div", {
-              className: "warning-icon",
-              children: "⚠️"
-            }), /* @__PURE__ */ jsx("h1", {
-              className: "title",
+            className: "text-center",
+            children: [/* @__PURE__ */ jsx("h1", {
+              className: "text-2xl font-bold mb-4",
               children: "Demo Expired"
             }), /* @__PURE__ */ jsx("p", {
-              className: "message",
-              children: "This demonstration version has expired. For more information or to request access, please contact the author."
-            }), /* @__PURE__ */ jsx("a", {
-              href: "https://pauldoros.site",
-              target: "_blank",
-              rel: "noopener noreferrer",
-              className: "contact-button",
-              children: "Contact Author"
-            }), /* @__PURE__ */ jsxs("div", {
-              className: "copyright",
-              children: ["© ", year, " Paul Doros. All rights reserved."]
+              className: "text-muted-foreground",
+              children: "This demo has expired. Please contact the developer for access."
             })]
           })
-        }), /* @__PURE__ */ jsx(ScrollRestoration, {}), /* @__PURE__ */ jsx(Scripts, {})]
+        })
       })]
     });
   }
   return /* @__PURE__ */ jsxs("html", {
     lang: "en",
-    "data-author": "Paul Doros",
-    "data-protected": "true",
-    className: "no-fouc",
     children: [/* @__PURE__ */ jsxs("head", {
       children: [/* @__PURE__ */ jsx("meta", {
         charSet: "utf-8"
       }), /* @__PURE__ */ jsx("meta", {
         name: "copyright",
         content: `© ${year} Paul Doros. All rights reserved.`
-      }), /* @__PURE__ */ jsx("script", {
-        dangerouslySetInnerHTML: {
-          __html: `
-              (function() {
-                function setTheme() {
-                  try {
-                    const theme = localStorage.getItem('theme') || 'system';
-                    const root = document.documentElement;
-                    const body = document.body;
-                    
-                    // Remove any existing theme classes
-                    root.classList.remove('light', 'dark');
-                    body.classList.remove('theme-ready');
-                    
-                    // Set initial theme
-                    if (theme === 'system') {
-                      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                      root.classList.add(systemTheme);
-                    } else {
-                      root.classList.add(theme);
-                    }
-                    
-                    // Add loaded class immediately
-                    root.classList.add('loaded');
-                    
-                    // Show content once theme is ready
-                    body.classList.add('theme-ready');
-                  } catch (e) {
-                    console.error('Error setting initial theme:', e);
-                  }
-                }
-
-                // Run immediately if DOM is already loaded
-                if (document.readyState === 'loading') {
-                  document.addEventListener('DOMContentLoaded', setTheme);
-                } else {
-                  setTheme();
-                }
-              })();
-            `
-        }
-      }), /* @__PURE__ */ jsx("style", {
-        dangerouslySetInnerHTML: {
-          __html: `
-              .no-fouc {
-                opacity: 0;
-                transition: opacity 0.2s ease-in;
-              }
-              .no-fouc.loaded {
-                opacity: 1;
-              }
-              :root {
-                color-scheme: light dark;
-              }
-              /* Prevent flash of unstyled content */
-              html {
-                visibility: visible;
-                opacity: 1;
-              }
-              /* Hide content until theme is applied */
-              body {
-                visibility: hidden;
-              }
-              body.theme-ready {
-                visibility: visible;
-              }
-            `
-        }
       }), /* @__PURE__ */ jsx(Meta, {}), /* @__PURE__ */ jsx(Links, {})]
     }), /* @__PURE__ */ jsxs("body", {
-      className: "transition-colors duration-200",
       children: [/* @__PURE__ */ jsx(ThemeProvider, {
         children: /* @__PURE__ */ jsx(SkipProvider, {
-          children: /* @__PURE__ */ jsxs("div", {
-            className: "flex flex-col min-h-screen",
-            children: [/* @__PURE__ */ jsxs("main", {
-              className: "flex-1",
-              children: [/* @__PURE__ */ jsx("div", {
-                className: "watermark-container"
-              }), /* @__PURE__ */ jsx(Outlet, {})]
-            }), /* @__PURE__ */ jsxs("footer", {
-              className: "py-2 text-center text-xs text-muted-foreground",
-              children: ["© ", year, " Paul Doros | Protected Demo"]
-            })]
-          })
+          children: /* @__PURE__ */ jsx(Outlet, {})
         })
       }), /* @__PURE__ */ jsx(ScrollRestoration, {}), /* @__PURE__ */ jsx(Scripts, {})]
     })]
@@ -2660,8 +2417,6 @@ const DrawerDescription = React.forwardRef(({ className, ...props }, ref) => /* 
   }
 ));
 DrawerDescription.displayName = "DrawerDescription";
-const VALIDATION_KEY = "pd_" + btoa("RemWasteSkips").substring(0, 8);
-const projectValidationSignature = "Paul_Doros_Demo_Protected_c" + (/* @__PURE__ */ new Date()).getFullYear();
 const expirationCheck = () => /* @__PURE__ */ new Date() < /* @__PURE__ */ new Date("2025-04-17");
 const STEPS = [{
   id: "postcode",
@@ -2725,20 +2480,8 @@ const skips = withComponentProps(function Component4({
     setSelectedSkip
   } = useSkipContext();
   useEffect(() => {
-    if (!expirationCheck() || !window[btoa("isValid")]) {
-      const checkLicense = () => {
-        try {
-          const validationElement = document.createElement("div");
-          validationElement.className = "pd__validation";
-          validationElement.dataset.key = VALIDATION_KEY;
-          validationElement.dataset.signature = projectValidationSignature;
-          document.body.appendChild(validationElement);
-          window[btoa("isValid")] = true;
-          console.log("%c• Protected by Paul Doros •", "color:transparent");
-        } catch (e) {
-        }
-      };
-      setTimeout(checkLicense, Math.random() * 5e3 + 3e3);
+    if (!expirationCheck()) {
+      console.log("Demo expired");
     }
   }, []);
   const [sortBy, setSortBy] = useState(searchParams.get("sort") || "size");
@@ -3764,7 +3507,7 @@ const route4 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProper
   __proto__: null,
   default: _404
 }, Symbol.toStringTag, { value: "Module" }));
-const serverManifest = { "entry": { "module": "/assets/entry.client-B6IGZpEH.js", "imports": ["/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/index-POQjFgHY.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root-DPMqlot9.js", "imports": ["/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/index-POQjFgHY.js", "/assets/with-props-FxcqGdth.js", "/assets/ThemeContext-CB_hqxvZ.js", "/assets/not-found-Dxlj_P1q.js", "/assets/utils-jAU0Cazi.js"], "css": ["/assets/root-BNb_3pNj.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/confirm": { "id": "routes/confirm", "parentId": "root", "path": "confirm", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/confirm-LYgHDI7k.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/ThemeContext-CB_hqxvZ.js", "/assets/SparklesHeader-Cjklr243.js", "/assets/utils-jAU0Cazi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-DF5cQi8v.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/skips": { "id": "routes/skips", "parentId": "root", "path": "skips", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/skips-DydnVZq3.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/ThemeContext-CB_hqxvZ.js", "/assets/SparklesHeader-Cjklr243.js", "/assets/utils-jAU0Cazi.js", "/assets/index-POQjFgHY.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/404": { "id": "routes/404", "parentId": "root", "path": "404", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/404-BM-NEme3.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/not-found-Dxlj_P1q.js", "/assets/utils-jAU0Cazi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-60d9b775.js", "version": "60d9b775" };
+const serverManifest = { "entry": { "module": "/assets/entry.client-B6IGZpEH.js", "imports": ["/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/index-POQjFgHY.js"], "css": [] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": true, "module": "/assets/root-ZHEN8B1v.js", "imports": ["/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/index-POQjFgHY.js", "/assets/with-props-FxcqGdth.js", "/assets/ThemeContext-CkY9A404.js", "/assets/not-found-8fJembGO.js", "/assets/utils-jAU0Cazi.js"], "css": ["/assets/root-nSO1_N8S.css"], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/confirm": { "id": "routes/confirm", "parentId": "root", "path": "confirm", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/confirm-wzEsTIsn.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/ThemeContext-CkY9A404.js", "/assets/SparklesHeader-DxGRGeCB.js", "/assets/utils-jAU0Cazi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/_index": { "id": "routes/_index", "parentId": "root", "path": void 0, "index": true, "caseSensitive": void 0, "hasAction": false, "hasLoader": true, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/_index-DF5cQi8v.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/skips": { "id": "routes/skips", "parentId": "root", "path": "skips", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/skips-DoJjQxBb.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/ThemeContext-CkY9A404.js", "/assets/SparklesHeader-DxGRGeCB.js", "/assets/utils-jAU0Cazi.js", "/assets/index-POQjFgHY.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 }, "routes/404": { "id": "routes/404", "parentId": "root", "path": "404", "index": void 0, "caseSensitive": void 0, "hasAction": false, "hasLoader": false, "hasClientAction": false, "hasClientLoader": false, "hasErrorBoundary": false, "module": "/assets/404-BErJIzV7.js", "imports": ["/assets/with-props-FxcqGdth.js", "/assets/chunk-GNGMS2XR-DFhD6QXP.js", "/assets/not-found-8fJembGO.js", "/assets/utils-jAU0Cazi.js"], "css": [], "clientActionModule": void 0, "clientLoaderModule": void 0, "hydrateFallbackModule": void 0 } }, "url": "/assets/manifest-dfc696b4.js", "version": "dfc696b4" };
 const assetsBuildDirectory = "build\\client";
 const basename = "/";
 const future = { "unstable_middleware": false, "unstable_optimizeDeps": false, "unstable_splitRouteModules": false, "unstable_viteEnvironmentApi": false };
